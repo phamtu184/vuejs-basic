@@ -1,19 +1,28 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="container2">
+    <div id="app">
+      <br />
+      <router-link to="/">Project</router-link> |
+      <router-link to="/template">Template</router-link>|
+      <router-link to="/tab">Tab</router-link>
+    </div>
+
+    <router-view />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Vue from "vue";
+import VueMaterial from "vue-material";
+import "vue-material/dist/vue-material.min.css";
+import "vue-material/dist/theme/default.css";
+import "bootstrap/dist/css/bootstrap.css";
+
+Vue.use(VueMaterial);
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  name: "App",
+};
 </script>
 
 <style>
@@ -23,6 +32,13 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+.container2 {
+  padding: 30px;
+}
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

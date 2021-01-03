@@ -1,0 +1,28 @@
+-Sự kiện
+  v-on lắng nghe sự kiện
+  v-on:submit.prevent="onSubmit"
+  event.stopPropagation() hoặc v-on:mousemove.stop --chặn tất cả các sự kiện trừ
+  v-on:keyup.enter="submit"
+-computed
+  Khi muốn thay đổi giá trị từ data thành giá trị mới, sử dụng computed -- không render lại các hàm khác như method
+-ràng buộc class
+  v-bind:class="{tênClass: tenData(true hoặc false), ...}"
+  hoặc sd computed:{
+    objClass: function(){
+      return{
+        active: this.isActive,
+        error: this.isError
+      }
+    }
+  }
+-rendering
+  không nên sử dụng v-if chung với v-for(render thừa) mà thay bằng computed
+-thay đổi mảng dữ liệu
+  $set(tenData, viTri, giaTri)
+-event up custom event
+  <my-component v-on:my-event="doSomething"></my-component>
+  để sử dụng sự kiện: this.$emit('my-event', data)
+  lưu ý từ component con:
+    + không được phép thay đổi props từ comp cha
+    + kích hoạt sự kiện ngay trong comp con
+    + khi kích hoạt thì sự kiện bên ngoài comp cha sẽ chạy
