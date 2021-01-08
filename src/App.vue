@@ -4,7 +4,8 @@
       <br />
       <router-link to="/">Project</router-link> |
       <router-link to="/template">Template</router-link>|
-      <router-link to="/tab">Tab</router-link>
+      <router-link to="/tab">Tab</router-link>|
+      <router-link to="/todo">To do</router-link>
     </div>
 
     <router-view />

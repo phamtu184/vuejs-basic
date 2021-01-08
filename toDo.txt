@@ -1,0 +1,27 @@
+sau khi add template name có khoảng trắng, không thể edit
+sau khi edit bỏ id để tự tăng, không thể edit
+
+- recently project name "pro 1", create new project name "pro 2"-> project page -> copy project "pro1"
+  rs=> Newly copied project named "pro 1"
+
+  f12 chinh duong dan dai coi vo layout k
+
+  review template keep type dài bị vỡ layout (apply template, edit param)
+
+  9. setting: path data scr khó hiểu
+  10. setting: status log không hiển thị
+  11.Masking setting(table): nút masking setting được trang trí button like, column setting không đc trang trí
+  12.               :khi data number quá lớn, thanh trượt để nhấn các nút valid, invalid
+  13.               : khi tăng số tag tăng -> hiển thị thông báo trên mh
+  14.           (column): no data header in basic setting, như tên column, data content is displayed
+  15.                 
+
+
+  23. "N" là dữ liệu ban đầu -> thực tế "*"
+  22. text -> select input là space data previe disappear
+  30. "," là dữ liệu ban đầu -> thực tế "-"
+  35. e-mail - Email
+  36. name - Username
+  37. The New password is same as the old one - old password
+  38. old password - current password
+  43. value seed đc chỉ rõ

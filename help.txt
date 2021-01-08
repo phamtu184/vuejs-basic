@@ -26,3 +26,5 @@
     + không được phép thay đổi props từ comp cha
     + kích hoạt sự kiện ngay trong comp con
     + khi kích hoạt thì sự kiện bên ngoài comp cha sẽ chạy
+-Giữ state cho component khi chuyển
+  <keep-alive>
