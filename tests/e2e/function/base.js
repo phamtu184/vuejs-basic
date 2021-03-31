@@ -21,7 +21,6 @@ export const logout = () => {
 
 export const changeLanguage = () => {
   const url = Cypress.config().testUrl;
-  cy.server();
   cy.route('GET', `${url}/api/language/en`).as('getLanguage');
   cy.get('#dropdownMenuLink.nav-link').click();
   cy.contains('English').click().wait('@getLanguage', { timeout: 20000 })
@@ -31,7 +30,14 @@ export const changeLanguage = () => {
 }
 
 export const visitBase = () => {
-  cy.visit(Cypress.config().testUrl);
+  const url = Cypress.config().testUrl;
+  cy.server();
+  cy.route('GET', `${url}/api/protocol/check`).as('checkProtocol');
+  cy.visit(Cypress.config().testUrl)
+    .wait('@checkProtocol', { timeout: 20000 })
+    .then((xhr) => {
+      expect(xhr.status).to.equal(200);
+    });
   cy.url().should('include', 'login');
   changeLanguage();
 }
@@ -47,4 +53,11 @@ export const navigateTemplate = () => {
     });
   cy.url().should('include', 'template');
   cy.get('.slider-menu-item').children().should('contain', 'Masking').and('contain', 'Dictionary');
+}
+
+export const checkEllipsisText = (name) => {
+  cy.contains(name)
+    .should('have.css', 'overflow', 'hidden')
+    .and('have.css', 'text-overflow', 'ellipsis')
+    .and('have.css', 'white-space', 'nowrap');
 }

@@ -1,3 +1,56 @@
+export const routeTemplate = () => {
+  const url = Cypress.config().testUrl;
+  cy.server();
+  cy.route('POST', `${url}/api/template/create`).as('addTemplate');
+  cy.route('GET', `${url}/api/protocol/check`).as('checkProtocol');
+  cy.route('POST', `${url}/api/template`).as('editTemplate');
+  cy.route('POST', `${url}/api/template/delete`).as('deleteTemplate');
+  cy.route('POST', `${url}/api/template/usage`).as('getTemplate');
+}
+
+export const addTemplate = (templateName, templateId) => {
+  cy.get('button[name=upload]').click();
+  cy.get('.md-field').first().next().type(templateName);
+  templateId && cy.get('.md-field').first().type(templateId);
+  cy.get('.md-dialog button')
+    .contains('OK')
+    .click()
+    .wait('@addTemplate', { timeout: 20000 })
+    .then((xhr) => {
+      expect(xhr.status).to.equal(200);
+    });
+  cy.contains(templateName).should('be.visible');
+  cy.reload()
+    .wait('@checkProtocol', { timeout: 20000 })
+    .then((xhr) => {
+      expect(xhr.status).to.equal(200);
+    });
+  cy.contains(templateName).should('be.visible');
+}
+
+export const changeTemplateName = (templateName, changeName) => {
+  cy.contains(templateName)
+    .parent('div').parent('td').parent('tr')
+    .within(() => {
+      cy.get('td').eq(6).click();
+    })
+  cy.get('.md-field').first().next().children('input').clear().type(changeName);
+  cy.get('.md-dialog button')
+    .contains('OK')
+    .click()
+    .wait('@editTemplate', { timeout: 20000 })
+    .then((xhr) => {
+      expect(xhr.status).to.equal(200);
+    });
+  cy.contains(changeName).should('be.visible');
+  cy.reload()
+    .wait('@checkProtocol', { timeout: 20000 })
+    .then((xhr) => {
+      expect(xhr.status).to.equal(200);
+    });
+  cy.contains(changeName).should('be.visible');
+}
+
 export const ignoreStringMasking = () => {
   cy.get('label').contains('Masking')
     .parent('.md-field')
