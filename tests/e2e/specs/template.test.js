@@ -1,7 +1,3 @@
-import {navigateTemplate} from '../function/base';
-import {addTemplate, changeTemplateName, ignoreStringMasking, openMaskingPopup, routeTemplate} from '../function/template'
-import {checkEllipsisText} from '../function/base'
-
 describe('Template test', () => {
   const url = Cypress.config().testUrl;
   let templateName = 'New template name ' + Date.now();
@@ -9,8 +5,8 @@ describe('Template test', () => {
   let id = 0;
 
   beforeEach(() => {
-    navigateTemplate();
-    routeTemplate();
+    cy.navigateTemplate();
+    cy.routeTemplate();
   })
 
   it('Add template success', () => {
@@ -36,7 +32,7 @@ describe('Template test', () => {
   })
 
   it('Add template success have id', () => {
-    addTemplate('template name', templateId);
+    cy.addTemplate('template name', templateId);
   })
 
   it('Add template fail have id', () => {
@@ -51,7 +47,7 @@ describe('Template test', () => {
   })
 
   it('Check title masking popup when add template', () => {
-    openMaskingPopup(templateName);
+    cy.openMaskingPopup(templateName);
     cy.get('.header.title').should('contain', templateName);
   })
 
@@ -66,7 +62,7 @@ describe('Template test', () => {
 
   it('Param editor add check ignore string (text, segment)', () => {
     cy.get('button[name=upload]').click();
-    ignoreStringMasking();
+    cy.ignoreStringMasking();
   })
 
   it('Param editor edit check ignore string (text, segment)', () => {
@@ -75,11 +71,11 @@ describe('Template test', () => {
       .within(() => {
         cy.get('td').eq(6).find('button').click();
       })
-    ignoreStringMasking();
+    cy.ignoreStringMasking();
   })
 
   it('Param editor ignore string input many fields', () => {
-    openMaskingPopup(templateName);
+    cy.openMaskingPopup(templateName);
     for(let i = 0; i< 3; i++){
       cy.get('button').contains('ADD').click();
       cy.get('.value')
@@ -99,7 +95,7 @@ describe('Template test', () => {
   })
 
   it('Param editor integer min max check', () => {
-    openMaskingPopup(templateName);
+    cy.openMaskingPopup(templateName);
     cy.get('select').first().select('Integer');
     cy.get('select').last().select('Min Max');
     cy.get('.in-row')
@@ -135,34 +131,34 @@ describe('Template test', () => {
 
   it('Change template name', () => {
     const changeName = 'Modify template name ' + Date.now();
-    changeTemplateName(templateName, changeName)
+    cy.changeTemplateName(templateName, changeName)
     templateName = changeName;
   })
 
   it('Check template name when add name too long (has space)', () => {
     const name = 'Check template name when add name too longCheck template name when add name too longCheck template name when add name too longCheck template name when add name too long';
-    addTemplate(name);
-    checkEllipsisText(name);
+    cy.addTemplate(name);
+    cy.checkEllipsisText(name);
   })
 
   it('Check template name when add name too long (no space)', () => {
     const name = 'ChecktemplatenamewhenaddnametoolongChecktemplatenamewhenaddnametoolongChecktemplatenamewhenaddnametoolongChecktemplatenamewhenaddnametoolongChecktemplatenamewhenaddnametoolong';
-    addTemplate(name);
-    checkEllipsisText(name);
+    cy.addTemplate(name);
+    cy.checkEllipsisText(name);
   })
 
   it('Check template name when edit name too long (has space)', () => {
     const name = 'Check template name when add name too longCheck template name when add name too longCheck template name when add name too longCheck template name when add name too long';
-    changeTemplateName(templateName, name);
+    cy.changeTemplateName(templateName, name);
     templateName = name;
-    checkEllipsisText(name);
+    cy.checkEllipsisText(name);
   })
 
   it('Check template name when edit name too long (no space)', () => {
     const name = 'ChecktemplatenamewhenaddnametoolongChecktemplatenamewhenaddnametoolongChecktemplatenamewhenaddnametoolongChecktemplatenamewhenaddnametoolongChecktemplatenamewhenaddnametoolong';
-    changeTemplateName(templateName, name);
+    cy.changeTemplateName(templateName, name);
     templateName = name;
-    checkEllipsisText(name);
+    cy.checkEllipsisText(name);
   })
 
   it('Delete template', () => {
