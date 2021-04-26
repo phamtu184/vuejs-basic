@@ -1,3 +1,4 @@
+import 'cypress-file-upload';
 describe('Template test', () => {
   const url = Cypress.config().testUrl;
   let templateName = 'New template name ' + Date.now();
@@ -161,6 +162,144 @@ describe('Template test', () => {
     cy.checkEllipsisText(name);
   })
 
+  it('Delete used template', () => {
+    const name = 'Template' + Date.now();
+    let idTemplate = Date.now();
+    cy.addTemplate(name, idTemplate);
+    cy.checkEllipsisText(name);
+    cy.get('ul li a.nav-link').first().children().contains('Projects').click()
+      .wait('@fetchProjects', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.get('.row .my-column .md-card').then(el => {
+      if (el.length > 0) {
+        cy.get(el.eq(0)).click()
+          .wait('@fetchProjectDb', { timeout: 20000 }).then((xhr) => {
+            expect(xhr.status).to.equal(200);
+          });
+      } else {
+        //create new project
+      }
+    });
+    cy.get('button .md-ripple div').contains('DB').then(el => {
+      if (el.hasClass('md-active')) {
+
+      } else {
+        cy.get(el).click();
+      }
+    });
+    cy.get('.slider-menu-item').contains('Tables').click()
+      .wait('@fetchTable', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.get('button .md-ripple div').contains('columns').then(el => {
+      if (el.length > 0) {
+        cy.get(el.eq(0)).click()
+          .wait('@fetchColumn', { timeout: 20000 }).then((xhr) => {
+            expect(xhr.status).to.equal(200);
+          });
+          cy.get('button .md-ripple div').contains('Edit Params').then(col => {
+            if(col.length > 0) {
+              cy.get(col.eq(0)).click();
+              cy.get('select.value').first().select('Template');
+              cy.get('button').contains('Refresh').click()
+                .wait('@fetchAllTemplate', { timeout: 20000 }).then((xhr) => {
+                  expect(xhr.status).to.equal(200);
+                });
+              cy.get('select.template-list').select(name);
+              cy.get('button .md-ripple div').contains('OK').click()
+                .wait('@updateColumn', { timeout: 20000 }).then((xhr) => {
+                  expect(xhr.status).to.equal(200);
+                });
+              cy.get('ul li a.nav-link').contains('Templates').click()
+                .wait('@getTemplate', { timeout: 20000 })
+                .then((xhr) => {
+                  expect(xhr.status).to.equal(200);
+                });
+              cy.wait(100);
+              cy.route('GET', `${url}/api/template/usage/` + idTemplate).as('getTemplate');
+              cy.contains(name).click();
+              cy.get('button[name=delete]').click()
+                .wait('@getTemplate', { timeout: 20000 }).then((xhr) => {
+                  expect(xhr.status).to.equal(200);
+                });
+              cy.contains('Are you sure you want to delete template');
+              cy.contains(name);
+            }
+          })
+      }
+    })
+  })
+
+  it('Delete used templates', () => {
+    const name = 'Template' + Date.now();
+    let idTemplate = Date.now();
+    cy.addTemplate(name, idTemplate);
+    cy.checkEllipsisText(name);
+    cy.get('ul li a.nav-link').first().children().contains('Projects').click()
+      .wait('@fetchProjects', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.get('.row .my-column .md-card').then(el => {
+      if (el.length > 0) {
+        cy.get(el.eq(0)).click()
+          .wait('@fetchProjectDb', { timeout: 20000 }).then((xhr) => {
+            expect(xhr.status).to.equal(200);
+          });
+      } else {
+        //create new project
+      }
+    });
+    cy.get('button .md-ripple div').contains('DB').then(el => {
+      if (el.hasClass('md-active')) {
+
+      } else {
+        cy.get(el).click();
+      }
+    });
+    cy.get('.slider-menu-item').contains('Tables').click()
+      .wait('@fetchTable', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.get('button .md-ripple div').contains('columns').then(el => {
+      if (el.length > 0) {
+        cy.get(el.eq(0)).click()
+          .wait('@fetchColumn', { timeout: 20000 }).then((xhr) => {
+            expect(xhr.status).to.equal(200);
+          });
+          cy.get('button .md-ripple div').contains('Edit Params').then(col => {
+            if(col.length > 0) {
+              cy.get(col.eq(0)).click();
+              cy.get('select.value').first().select('Template');
+              cy.get('button').contains('Refresh').click()
+                .wait('@fetchAllTemplate', { timeout: 20000 }).then((xhr) => {
+                  expect(xhr.status).to.equal(200);
+                });
+              cy.get('select.template-list').select(name);
+              cy.get('button .md-ripple div').contains('OK').click()
+                .wait('@updateColumn', { timeout: 20000 }).then((xhr) => {
+                  expect(xhr.status).to.equal(200);
+                });
+              cy.get('ul li a.nav-link').contains('Templates').click()
+                .wait('@getTemplate', { timeout: 20000 })
+                .then((xhr) => {
+                  expect(xhr.status).to.equal(200);
+                });
+              cy.wait(100);
+              cy.route('GET', `${url}/api/template/usage/` + idTemplate).as('getTemplate');
+              cy.get('thead').find('.md-checkbox').click();
+              cy.get('button[name=delete]').click()
+                .wait('@getTemplate', { timeout: 20000 }).then((xhr) => {
+                  expect(xhr.status).to.equal(200);
+                });
+              cy.contains('Are you sure you want to delete these templates');
+              cy.contains(name);
+            }
+          })
+      }
+    })
+  })
+
   it('Delete template', () => {
     cy.route('GET', `${url}/api/template/usage/` + id).as('getTemplate');
     cy.contains(templateName).click();
@@ -174,6 +313,21 @@ describe('Template test', () => {
       });
   })
 
+  it('Add 30 templates, check new page', () => {
+    for (let i = 1; i <= 30; i++) {
+      const name = 'Template no ' + i;
+      const id = Date.now() + i;
+      cy.addTemplate(name, id);
+    }
+    cy.route('GET', `${url}/api/template/fetch/2`).as('fetchTemplate');
+    cy.addTemplate('next page template')
+      .wait('@fetchTemplate', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.get('tr.md-table-row').should('have.length', 1);
+    cy.get('button[name=left-group]').eq(1).should('have.class', 'md-primary');
+  })
+
   it('Delete all template, check no template', () => {
     cy.get('thead').find('.md-checkbox').click();
     cy.get('button[name=delete]').click()
@@ -185,6 +339,158 @@ describe('Template test', () => {
         expect(xhr.status).to.equal(200);
       });
     cy.contains('No template found').should('be.visible');
+  })
+
+  it('Upload dictionary success', () => {
+    cy.contains('Dictionary').click()
+      .wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.get('button[name=upload]').click();
+    cy.get('input[type=file]').attachFile('../files/活性とする.csv');
+    cy.contains('OK').click()
+      .wait('@uploadDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.contains('活性とする.csv').should('be.visible');
+    cy.reload().wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+      expect(xhr.status).to.equal(200);
+    });
+    cy.contains('活性とする.csv').should('be.visible');
+  })
+
+  it('Cancel upload dictionary', () => {
+    cy.contains('Dictionary').click()
+    .wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+      expect(xhr.status).to.equal(200);
+    });
+    cy.get('button[name=upload]').click();
+    cy.get('input[type=file]').attachFile('../files/test.csv');
+    cy.contains('OK').click();
+    cy.contains('Cancel').click().wait(1000);
+    cy.contains('Upload abort !').should('be.visible');
+    cy.contains('Ok').click();
+    cy.contains('test.csv').should('not.be.visible');
+    cy.reload().wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+      expect(xhr.status).to.equal(200);
+    });
+    cy.contains('test.csv').should('not.be.visible');
+  })
+
+  it('Dictionary file exist override', () => {
+    cy.contains('Dictionary').click()
+      .wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.get('button[name=upload]').click();
+    cy.get('input[type=file]').attachFile('../files/活性とする.csv');
+    cy.contains('OK').click()
+      .wait('@uploadDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.contains('File exists !').should('be.visible');
+    cy.contains('OK').click()
+      .wait('@uploadDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.contains('Upload successful').should('be.visible');
+    cy.contains('活性とする.csv').should('be.visible');
+    cy.reload().wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+      expect(xhr.status).to.equal(200);
+    });
+    cy.contains('活性とする.csv').should('be.visible');
+  })
+
+  it('Dictionary file exist cancel', () => {
+    cy.contains('Dictionary').click()
+      .wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.get('button[name=upload]').click();
+    cy.get('input[type=file]').attachFile('../files/活性とする.csv');
+    cy.contains('OK').click()
+      .wait('@uploadDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.contains('File exists !').should('be.visible');
+    cy.contains('Cancel').click();
+    cy.contains('Upload successful').should('not.be.visible');
+    cy.contains('活性とする.csv').should('be.visible');
+  })
+
+  it('Delete dictionary file', () => {
+    cy.contains('Dictionary').click()
+      .wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.get('button[name=delete]').should('not.be.visible');
+    cy.contains('活性とする.csv').click();
+    cy.get('button[name=delete]').should('be.visible').click();
+    cy.contains('OK').click()
+      .wait('@deleteDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.contains('活性とする.csv').should('not.be.visible');
+    cy.reload().wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+      expect(xhr.status).to.equal(200);
+    });
+    cy.contains('活性とする.csv').should('not.be.visible');
+  })
+
+  it('Upload 30 dictionary, check next page', () => {
+    cy.contains('Dictionary').click()
+      .wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    for (let i=1;i<=30;i++) {
+      cy.get('button[name=upload]').click();
+      cy.get('input[type=file]').attachFile(`../files/1 copy ${i}.csv`);
+      cy.contains('OK').click()
+        .wait('@uploadDictionary', { timeout: 20000 }).then((xhr) => {
+          expect(xhr.status).to.equal(200);
+        });
+    }
+    cy.get('tr.md-table-row').should('have.length', 1);
+    cy.get('button[name=left-group]').eq(1).should('have.class', 'md-primary');
+  })
+
+  it('Delete all dictionary file', () => {
+    cy.contains('Dictionary').click()
+      .wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.get('button[name=delete]').should('not.be.visible');
+    cy.get('thead').find('.md-checkbox').click();
+    cy.get('button[name=delete]').should('be.visible').click();
+    cy.contains('OK').click()
+      .wait('@deleteDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.contains('No file found').should('be.visible');
+    cy.reload().wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+      expect(xhr.status).to.equal(200);
+    });
+    cy.contains('No file found').should('be.visible');
+  })
+
+  it('Upload dictionary file with long, japanese name', () => {
+    cy.contains('Dictionary').click()
+      .wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.get('button[name=upload]').click()
+    cy.get('input[type=file]').attachFile('../files/投すー験53差7文ねぐもイ告近イり件61無いつり法再雪ケムウ依厳ホア期北縮ゃ駐話の教会ふぶぼ際欲町愛亨リ。掲ミナテシ英匿東たぴさゆ月転アヨヲ数管こ問25信号ムヨル報玉市た差抜転チ速原づや覧近整研就に。話ホルサ平写ぜす廃発ユウ質引語ぜだ販正ゃゅ教30左ヨヤヘリ議売文ヘユ効結ざレ.csv');
+    cy.contains('OK').should('be.disabled');
+  })
+
+  it('Upload dictionary file with none csv extension', () => {
+    cy.contains('Dictionary').click()
+      .wait('@fetchDictionary', { timeout: 20000 }).then((xhr) => {
+        expect(xhr.status).to.equal(200);
+      });
+    cy.get('button[name=upload]').click()
+    cy.get('input[type=file]').attachFile('../files/sample.sql');
+    cy.contains('OK').should('be.disabled');
   })
 
 })
